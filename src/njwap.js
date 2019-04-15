@@ -385,6 +385,6 @@ export class NjwapExplorer {
   }
 
   openResource(resource) {
-    vscode.window.showTextDocument(resource);
+    vscode.commands.executeCommand('vscode.open', resource, { preview: false });
   }
 }
