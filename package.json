@@ -1,0 +1,74 @@
+{
+  "name": "njwap-projects-tree-view",
+  "displayName": "njwap-tree-view",
+  "description": "为 njwap 项目定制的 Tree View 扩展",
+  "version": "0.0.1",
+  "publisher": "hex-ci",
+  "repository": "https://github.com/hex-ci/njwap-projects-tree-view-vscode",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.25.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "treeview"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "njwapProjects",
+          "name": "njwap 项目"
+        }
+      ]
+    },
+    "commands": [],
+    "menus": {
+      "editor/context": []
+    },
+    "keybindings": [],
+    "configuration": {
+      "type": "object",
+      "title": "njwap 配置",
+      "properties": {
+        "njwap-projects-tree-view.wwwPath": {
+          "type": "string",
+          "default": "",
+          "description": "www 项目目录"
+        },
+        "njwap-projects-tree-view.njwapPath": {
+          "type": "string",
+          "default": "",
+          "description": "njwap 项目目录"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "babel src -d out -s --delete-dir-on-start",
+    "watch": "babel src -d out -w -s --verbose",
+    "postinstall": "node ./node_modules/vscode/bin/install"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.1.2",
+    "@babel/core": "^7.1.2",
+    "@babel/preset-env": "^7.1.0",
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^8.10.25",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^4.11.0",
+    "typescript": "^2.6.1",
+    "vscode": "^1.1.21"
+  },
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "rimraf": "^2.6.3"
+  }
+}
