@@ -4,13 +4,14 @@ import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as rimraf from 'rimraf';
 
-//#region Utilities
 let _;
+
 (function(_) {
   function handleResult(resolve, reject, error, result) {
     if (error) {
       reject(massageError(error));
-    } else {
+    }
+    else {
       resolve(result);
     }
   }
@@ -54,8 +55,7 @@ let _;
       fs.readdir(path, (error, children) => {
         if (error) {
           resolve([]);
-        }
-        else {
+        } else {
           return handleResult(resolve, reject, error, normalizeNFC(children))
         }
       });
@@ -147,16 +147,13 @@ export class FileStat {
   }
 }
 
-//#endregion
 export class NjwapProvider {
   constructor() {
-    this.options = vscode.workspace.getConfiguration('njwap-projects-tree-view');
-
-    this._onDidChangeFile = new vscode.EventEmitter();
+    this._onDidChangeTreeData = new vscode.EventEmitter();
   }
 
-  get onDidChangeFile() {
-    return this._onDidChangeFile.event;
+  get onDidChangeTreeData() {
+    return this._onDidChangeTreeData.event;
   }
 
   stat(uri) {
@@ -186,6 +183,8 @@ export class NjwapProvider {
 
   // tree data provider
   async getChildren(element) {
+    this.options = vscode.workspace.getConfiguration('njwap-projects-tree-view');
+
     if (!this.options.wwwPath || !this.options.wwwProjectPath) {
       return [];
     }
@@ -194,8 +193,7 @@ export class NjwapProvider {
       if (element.depth === 1) {
         const currentPath = path.relative(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html'), element.uri.path);
 
-        return [
-          {
+        return [{
             uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
@@ -238,8 +236,7 @@ export class NjwapProvider {
             label: 'less'
           },
         ]
-      }
-      else if (element.depth > 1) {
+      } else if (element.depth > 1) {
         const children = await this.readDirectory(element.uri);
 
         return children.map(([name, type]) => ({
@@ -247,8 +244,7 @@ export class NjwapProvider {
           type,
           depth: element.depth + 1
         }));
-      }
-      else {
+      } else {
         let children = await this.readDirectory(element.uri);
 
         children = children.filter(item => item[1] === vscode.FileType.Directory);
@@ -259,8 +255,7 @@ export class NjwapProvider {
           depth: element.depth + 1
         }));
       }
-    }
-    else {
+    } else {
       const workspaceFolder = {
         uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html'))
       };
@@ -315,11 +310,13 @@ export class NjwapExplorer {
 
     vscode.commands.registerCommand('njwap-projects-tree-view.openFile', (resource) => this.openResource(resource));
     vscode.commands.registerCommand('njwap-projects-tree-view.refresh', () => {
-      console.log('refresh');
+      treeDataProvider._onDidChangeTreeData.fire();
     });
   }
 
   openResource(resource) {
-    vscode.commands.executeCommand('vscode.open', resource, { preview: false });
+    vscode.commands.executeCommand('vscode.open', resource, {
+      preview: false
+    });
   }
 }
