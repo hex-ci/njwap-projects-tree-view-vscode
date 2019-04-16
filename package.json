@@ -55,12 +55,12 @@
         "njwap-projects-tree-view.wwwPath": {
           "type": "string",
           "default": "",
-          "description": "www 项目目录"
+          "description": "www 项目绝对路径"
         },
         "njwap-projects-tree-view.wwwProjectPath": {
           "type": "string",
           "default": "",
-          "description": "wwwProject 项目目录"
+          "description": "wwwProject 项目绝对路径"
         }
       }
     }
