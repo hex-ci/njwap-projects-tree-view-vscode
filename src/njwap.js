@@ -150,30 +150,14 @@ export class FileStat {
 //#endregion
 export class NjwapProvider {
   constructor() {
+    this.options = vscode.workspace.getConfiguration('njwap-projects-tree-view');
+
     this._onDidChangeFile = new vscode.EventEmitter();
   }
 
   get onDidChangeFile() {
     return this._onDidChangeFile.event;
   }
-
-  // watch(uri, options) {
-  //   const watcher = fs.watch(uri.fsPath, {
-  //     recursive: options.recursive
-  //   }, async (event, filename) => {
-  //     const filepath = path.join(uri.fsPath, _.normalizeNFC(filename.toString()));
-  //     // TODO support excludes (using minimatch library?)
-  //     this._onDidChangeFile.fire([{
-  //       type: event === 'change' ? vscode.FileChangeType.Changed : await _.exists(filepath) ? vscode.FileChangeType.Created : vscode.FileChangeType.Deleted,
-  //       uri: uri.with({
-  //         path: filepath
-  //       })
-  //     }]);
-  //   });
-  //   return {
-  //     dispose: () => watcher.close()
-  //   };
-  // }
 
   stat(uri) {
     return this._stat(uri.fsPath);
@@ -200,111 +184,58 @@ export class NjwapProvider {
     return Promise.resolve(result);
   }
 
-  createDirectory(uri) {
-    return _.mkdir(uri.fsPath);
-  }
-
-  readFile(uri) {
-    return _.readfile(uri.fsPath);
-  }
-
-  writeFile(uri, content, options) {
-    return this._writeFile(uri, content, options);
-  }
-
-  async _writeFile(uri, content, options) {
-    const exists = await _.exists(uri.fsPath);
-    if (!exists) {
-      if (!options.create) {
-        throw vscode.FileSystemError.FileNotFound();
-      }
-      await _.mkdir(path.dirname(uri.fsPath));
-    } else {
-      if (!options.overwrite) {
-        throw vscode.FileSystemError.FileExists();
-      }
-    }
-    return _.writefile(uri.fsPath, content);
-  }
-
-  delete(uri, options) {
-    if (options.recursive) {
-      return _.rmrf(uri.fsPath);
-    }
-    return _.unlink(uri.fsPath);
-  }
-
-  rename(oldUri, newUri, options) {
-    return this._rename(oldUri, newUri, options);
-  }
-
-  async _rename(oldUri, newUri, options) {
-    const exists = await _.exists(newUri.fsPath);
-    if (exists) {
-      if (!options.overwrite) {
-        throw vscode.FileSystemError.FileExists();
-      } else {
-        await _.rmrf(newUri.fsPath);
-      }
-    }
-    const parentExists = await _.exists(path.dirname(newUri.fsPath));
-    if (!parentExists) {
-      await _.mkdir(path.dirname(newUri.fsPath));
-    }
-    return _.rename(oldUri.fsPath, newUri.fsPath);
-  }
-
   // tree data provider
   async getChildren(element) {
-    // console.log(element);
+    if (!this.options.wwwPath || !this.options.wwwProjectPath) {
+      return [];
+    }
 
     if (element) {
-
       if (element.depth === 1) {
-        const currentPath = path.relative('/Users/zhaochang/Projects/changba/wwwProject/njwap/src/html', element.uri.path);
+        const currentPath = path.relative(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html'), element.uri.path);
 
         return [
           {
-            uri: vscode.Uri.file(path.join('/Users/zhaochang/Projects/changba/wwwProject/njwap/src/html', currentPath)),
+            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            name: 'html'
+            label: 'html'
           },
           {
-            uri: vscode.Uri.file(path.join('/Users/zhaochang/Projects/changba/wwwProject/njwap/src/cdn_js', currentPath)),
+            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_js', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            name: 'cdn_js'
+            label: 'cdn_js'
           },
           {
-            uri: vscode.Uri.file(path.join('/Users/zhaochang/Projects/changba/wwwProject/njwap/src/cdn_css', currentPath)),
+            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_css', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            name: 'cdn_css'
+            label: 'cdn_css'
           },
           {
-            uri: vscode.Uri.file(path.join('/Users/zhaochang/Projects/changba/wwwProject/njwap/src/cdn_img', currentPath)),
+            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_img', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            name: 'cdn_img'
+            label: 'cdn_img'
           },
           {
-            uri: vscode.Uri.file(path.join('/Users/zhaochang/Projects/changba/wwwProject/njwap/src/less', currentPath)),
+            uri: vscode.Uri.file(path.join(this.options.wwwPath, 'njwap_server', 'controller', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            name: 'less'
+            label: 'controller'
           },
           {
-            uri: vscode.Uri.file(path.join('/Users/zhaochang/Projects/changba/www/njwap_server/controller', currentPath)),
+            uri: vscode.Uri.file(path.join(this.options.wwwPath, 'njwap_server', 'model', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            name: 'controller'
+            label: 'model'
           },
           {
-            uri: vscode.Uri.file(path.join('/Users/zhaochang/Projects/changba/www/njwap_server/model', currentPath)),
+            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'less', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            name: 'model'
+            label: 'less'
           },
         ]
       }
@@ -329,13 +260,11 @@ export class NjwapProvider {
         }));
       }
     }
+    else {
+      const workspaceFolder = {
+        uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html'))
+      };
 
-    // const workspaceFolder = vscode.workspace.workspaceFolders.filter(folder => folder.uri.scheme === 'file')[0];
-    const workspaceFolder = {
-      uri: vscode.Uri.file('/Users/zhaochang/Projects/changba/wwwProject/njwap/src/html')
-    };
-
-    if (workspaceFolder) {
       let children = await this.readDirectory(workspaceFolder.uri);
 
       children = children.filter(item => item[1] === vscode.FileType.Directory);
@@ -353,16 +282,18 @@ export class NjwapProvider {
         depth: 0
       }));
     }
-
-    return [];
   }
 
   getTreeItem(element) {
-    const treeItem = new vscode.TreeItem(element.name || element.uri, element.type === vscode.FileType.Directory ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
+    const treeItem = new vscode.TreeItem(element.uri, element.type === vscode.FileType.Directory ? vscode.TreeItemCollapsibleState.Collapsed : vscode.TreeItemCollapsibleState.None);
+
+    if (element.label) {
+      treeItem.label = element.label;
+    }
 
     if (element.type === vscode.FileType.File) {
       treeItem.command = {
-        command: 'fileExplorer.openFile',
+        command: 'njwap-projects-tree-view.openFile',
         title: "Open File",
         arguments: [element.uri],
       };
@@ -374,14 +305,18 @@ export class NjwapProvider {
 }
 
 export class NjwapExplorer {
-  constructor() {
+  constructor(ctx) {
     const treeDataProvider = new NjwapProvider();
 
-    this.fileExplorer = vscode.window.createTreeView('njwapProjects', {
+    this.ctx = ctx;
+    this.instance = vscode.window.createTreeView('njwapProjects', {
       treeDataProvider
     });
 
-    vscode.commands.registerCommand('fileExplorer.openFile', (resource) => this.openResource(resource));
+    vscode.commands.registerCommand('njwap-projects-tree-view.openFile', (resource) => this.openResource(resource));
+    vscode.commands.registerCommand('njwap-projects-tree-view.refresh', () => {
+      console.log('refresh');
+    });
   }
 
   openResource(resource) {

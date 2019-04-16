@@ -16,7 +16,7 @@
     "treeview"
   ],
   "activationEvents": [
-    "*"
+    "onView:njwapProjects"
   ],
   "main": "./out/extension",
   "contributes": {
@@ -28,9 +28,24 @@
         }
       ]
     },
-    "commands": [],
+    "commands": [
+			{
+				"command": "njwap-projects-tree-view.refresh",
+				"title": "刷新"
+			},
+			{
+				"command": "njwap-projects-tree-view.openFile",
+				"title": "打开"
+			}
+    ],
     "menus": {
-      "editor/context": []
+			"view/title": [
+				{
+          "command": "njwap-projects-tree-view.refresh",
+					"when": "view == njwapProjects",
+					"group": "navigation"
+				}
+			]
     },
     "keybindings": [],
     "configuration": {
@@ -42,10 +57,10 @@
           "default": "",
           "description": "www 项目目录"
         },
-        "njwap-projects-tree-view.njwapPath": {
+        "njwap-projects-tree-view.wwwProjectPath": {
           "type": "string",
           "default": "",
-          "description": "njwap 项目目录"
+          "description": "wwwProject 项目目录"
         }
       }
     }
