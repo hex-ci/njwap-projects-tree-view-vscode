@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
+import mkdirp from 'mkdirp';
 import * as rimraf from 'rimraf';
 
 let _;
@@ -193,58 +193,75 @@ export class NjwapProvider {
       if (element.depth === 1) {
         const currentPath = path.relative(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html'), element.uri.path);
 
-        return [{
+        return [
+          {
             uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            label: 'html'
+            label: 'html',
+            pathType: 'wwwProject'
           },
           {
             uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_js', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            label: 'cdn_js'
+            label: 'cdn_js',
+            pathType: 'wwwProject'
           },
           {
             uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_css', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            label: 'cdn_css'
+            label: 'cdn_css',
+            pathType: 'wwwProject'
           },
           {
             uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_img', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            label: 'cdn_img'
+            label: 'cdn_img',
+            pathType: 'wwwProject'
           },
           {
             uri: vscode.Uri.file(path.join(this.options.wwwPath, 'njwap_server', 'controller', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            label: 'controller'
+            label: 'controller',
+            pathType: 'www'
           },
           {
             uri: vscode.Uri.file(path.join(this.options.wwwPath, 'njwap_server', 'model', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            label: 'model'
+            label: 'model',
+            pathType: 'www'
           },
           {
             uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'less', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
-            label: 'less'
+            label: 'less',
+            pathType: 'wwwProject'
           },
         ]
-      } else if (element.depth > 1) {
+      }
+      else if (element.depth > 1) {
         const children = await this.readDirectory(element.uri);
+
+        children.sort((a, b) => {
+          if (a[1] === b[1]) {
+            return a[0].localeCompare(b[0]);
+          }
+          return a[1] === vscode.FileType.Directory ? -1 : 1;
+        })
 
         return children.map(([name, type]) => ({
           uri: vscode.Uri.file(path.join(element.uri.fsPath, name)),
           type,
           depth: element.depth + 1
         }));
-      } else {
+      }
+      else {
         let children = await this.readDirectory(element.uri);
 
         children = children.filter(item => item[1] === vscode.FileType.Directory);
@@ -255,7 +272,9 @@ export class NjwapProvider {
           depth: element.depth + 1
         }));
       }
-    } else {
+    }
+    else {
+      // 根级
       const workspaceFolder = {
         uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html'))
       };
@@ -289,10 +308,13 @@ export class NjwapProvider {
     if (element.type === vscode.FileType.File) {
       treeItem.command = {
         command: 'njwap-projects-tree-view.openFile',
-        title: "Open File",
+        title: "打开文件",
         arguments: [element.uri],
       };
       treeItem.contextValue = 'file';
+    }
+    else if (element.type === vscode.FileType.Directory && element.depth > 1) {
+      treeItem.contextValue = 'labelFolder';
     }
 
     return treeItem;
@@ -305,11 +327,105 @@ export class NjwapExplorer {
 
     this.ctx = ctx;
     this.instance = vscode.window.createTreeView('njwapProjects', {
+      showCollapseAll: true,
       treeDataProvider
     });
 
     vscode.commands.registerCommand('njwap-projects-tree-view.openFile', (resource) => this.openResource(resource));
     vscode.commands.registerCommand('njwap-projects-tree-view.refresh', () => {
+      treeDataProvider._onDidChangeTreeData.fire();
+    });
+
+    vscode.commands.registerCommand('njwap-projects-tree-view.createFolder', async (element) => {
+      let currentPath;
+
+      if (element.label) {
+        if (element.pathType === 'wwwProject') {
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwProjectPath, 'njwap', 'src', element.label), element.uri.path);
+        }
+        else {
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwPath, 'njwap_server', element.label), element.uri.path);
+        }
+      }
+      else {
+        if (element.uri.path.indexOf(path.join(treeDataProvider.options.wwwProjectPath, 'njwap', 'src')) === 0) {
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwProjectPath, 'njwap', 'src'), element.uri.path);
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwProjectPath, 'njwap', 'src', currentPath.split(path.sep)[0]), element.uri.path);
+          currentPath = currentPath.split(path.sep).slice(0, 2).join(path.sep);
+        }
+        else {
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwPath, 'njwap_server'), element.uri.path);
+        }
+      }
+
+      const result = await vscode.window.showInputBox({
+        prompt: `项目: ${currentPath}`,
+        placeHolder: `在 ${element.label || path.basename(element.uri.path)} 中新建文件夹`
+      });
+
+      if (!result) {
+        return;
+      }
+
+      await _.mkdir(path.join(element.uri.path, result));
+
+      treeDataProvider._onDidChangeTreeData.fire();
+    });
+
+    vscode.commands.registerCommand('njwap-projects-tree-view.createFile', async (element) => {
+      let currentPath;
+
+      if (element.label) {
+        if (element.pathType === 'wwwProject') {
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwProjectPath, 'njwap', 'src', element.label), element.uri.path);
+        }
+        else {
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwPath, 'njwap_server', element.label), element.uri.path);
+        }
+      }
+      else {
+        if (element.uri.path.indexOf(path.join(treeDataProvider.options.wwwProjectPath, 'njwap', 'src')) === 0) {
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwProjectPath, 'njwap', 'src'), element.uri.path);
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwProjectPath, 'njwap', 'src', currentPath.split(path.sep)[0]), element.uri.path);
+          currentPath = currentPath.split(path.sep).slice(0, 2).join(path.sep);
+        }
+        else {
+          currentPath = path.relative(path.join(treeDataProvider.options.wwwPath, 'njwap_server'), element.uri.path);
+        }
+      }
+
+      const result = await vscode.window.showInputBox({
+        prompt: `项目: ${currentPath}`,
+        placeHolder: `在 ${element.label || path.basename(element.uri.path)} 中新建文件`
+      });
+
+      if (!result) {
+        return;
+      }
+
+      await _.writefile(path.join(element.uri.path, result), '');
+
+      treeDataProvider._onDidChangeTreeData.fire();
+    });
+
+    vscode.commands.registerCommand('njwap-projects-tree-view.rename', async (element) => {
+      const result = await vscode.window.showInputBox({
+        value: path.basename(element.uri.path)
+      });
+
+      await _.rename(element.uri.path, path.join(path.dirname(element.uri.path), result));
+
+      treeDataProvider._onDidChangeTreeData.fire();
+    });
+
+    vscode.commands.registerCommand('njwap-projects-tree-view.remove', async (element) => {
+      // const result = await vscode.window.showInputBox({
+      //   prompt: `项目: ${currentPath}`,
+      //   placeHolder: `在 ${element.label || path.basename(element.uri.path)} 中新建文件`
+      // });
+
+      await _.rmrf(element.uri.path);
+
       treeDataProvider._onDidChangeTreeData.fire();
     });
   }

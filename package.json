@@ -35,15 +35,58 @@
       },
       {
         "command": "njwap-projects-tree-view.openFile",
-        "title": "打开"
-      }
+        "title": "打开文件"
+      },
+      {
+        "command": "njwap-projects-tree-view.createFolder",
+        "title": "新建文件夹"
+      },
+      {
+        "command": "njwap-projects-tree-view.createFile",
+        "title": "新建文件"
+      },
+      {
+        "command": "njwap-projects-tree-view.rename",
+        "title": "重命名"
+      },
+      {
+        "command": "njwap-projects-tree-view.remove",
+        "title": "删除"
+      },
+			{
+				"command": "njwap-projects-tree-view.revealFile",
+				"title": "在 njwap 项目中显示"
+			}
     ],
     "menus": {
+			"editor/title/context": [
+				{
+					"command": "njwap-projects-tree-view.revealFile"
+				}
+			],
       "view/title": [
         {
           "command": "njwap-projects-tree-view.refresh",
           "when": "view == njwapProjects",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "njwap-projects-tree-view.createFolder",
+          "when": "viewItem == labelFolder"
+        },
+        {
+          "command": "njwap-projects-tree-view.createFile",
+          "when": "viewItem == labelFolder"
+        },
+        {
+          "command": "njwap-projects-tree-view.rename",
+          "when": "viewItem == labelFolder || viewItem == file"
+        },
+        {
+          "command": "njwap-projects-tree-view.remove",
+          "when": "viewItem == labelFolder || viewItem == file"
         }
       ]
     },
