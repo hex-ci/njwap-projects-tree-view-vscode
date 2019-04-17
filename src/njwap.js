@@ -2,7 +2,7 @@ import * as vscode from 'vscode';
 import * as path from 'path';
 import * as fs from 'fs';
 import mkdirp from 'mkdirp';
-import * as rimraf from 'rimraf';
+import rimraf from 'rimraf';
 
 let _;
 
@@ -313,8 +313,13 @@ export class NjwapProvider {
       };
       treeItem.contextValue = 'file';
     }
-    else if (element.type === vscode.FileType.Directory && element.depth > 1) {
-      treeItem.contextValue = 'labelFolder';
+    else if (element.type === vscode.FileType.Directory) {
+      if (element.depth == 2) {
+        treeItem.contextValue = 'labelFolder';
+      }
+      else if (element.depth > 2) {
+        treeItem.contextValue = 'folder';
+      }
     }
 
     return treeItem;
@@ -410,7 +415,8 @@ export class NjwapExplorer {
 
     vscode.commands.registerCommand('njwap-projects-tree-view.rename', async (element) => {
       const result = await vscode.window.showInputBox({
-        value: path.basename(element.uri.path)
+        value: path.basename(element.uri.path),
+        valueSelection: [0, path.basename(element.uri.path).lastIndexOf('.')]
       });
 
       await _.rename(element.uri.path, path.join(path.dirname(element.uri.path), result));
@@ -419,14 +425,13 @@ export class NjwapExplorer {
     });
 
     vscode.commands.registerCommand('njwap-projects-tree-view.remove', async (element) => {
-      // const result = await vscode.window.showInputBox({
-      //   prompt: `项目: ${currentPath}`,
-      //   placeHolder: `在 ${element.label || path.basename(element.uri.path)} 中新建文件`
-      // });
+      const result = await vscode.window.showInformationMessage(`确认要删除 ${path.basename(element.uri.path)} 吗？`, { title: '确认' }, { title: '取消' });
 
-      await _.rmrf(element.uri.path);
+      if (result && result.title === '确认') {
+        await _.rmrf(element.uri.path);
 
-      treeDataProvider._onDidChangeTreeData.fire();
+        treeDataProvider._onDidChangeTreeData.fire();
+      }
     });
   }
 
