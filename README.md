@@ -1,3 +1,7 @@
-# njwap-projects-tree-view
+# njwap 资源管理器
 
-为 njwap 项目定制的 Tree View 扩展
+为 njwap 项目定制的资源管理器扩展
+
+## 使用方法
+
+在编辑器 **设置** 中搜索 **njwap** ，分别设置 www 项目目录和 wwwProject 项目目录，再去编辑器左侧 **资源管理器** 中的 **NJWAP 项目** 视图中点击刷新即可。
