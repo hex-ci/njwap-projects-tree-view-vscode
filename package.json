@@ -142,6 +142,16 @@
           "type": "string",
           "default": "",
           "description": "wwwProject 项目绝对路径"
+        },
+        "njwap-projects-tree-view.includes": {
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string",
+            "default": "",
+            "description": "项目名称，格式：一级目录/二级目录"
+          },
+          "description": "项目白名单，只显示设置的项目，不设置则显示所有项目。数组格式，每项为一个字符串，格式：一级目录/二级目录，例如：yunying/xxx"
         }
       }
     }

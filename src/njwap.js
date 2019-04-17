@@ -189,6 +189,34 @@ export class NjwapProvider {
     return Promise.resolve(result);
   }
 
+  getIncludes() {
+    if (!this.options.includes) {
+      return false;
+    }
+
+    let first = [];
+    let second = [];
+
+    this.options.includes.forEach(item => {
+      const value = item.split('/');
+
+      if (value[0] && value[1]) {
+        first.push(value[0]);
+        second.push(value[1]);
+      }
+    });
+
+    if (first.length > 0 && second.length > 0) {
+      return {
+        first,
+        second
+      };
+    }
+    else {
+      return false;
+    }
+  }
+
   // tree data provider
   async getChildren(element) {
     this.options = vscode.workspace.getConfiguration('njwap-projects-tree-view');
@@ -274,6 +302,12 @@ export class NjwapProvider {
 
         children = children.filter(item => item[1] === vscode.FileType.Directory);
 
+        let includes = this.getIncludes();
+
+        if (includes !== false) {
+          children = children.filter(item => includes.second.indexOf(item[0]) >= 0);
+        }
+
         return children.map(([name, type]) => ({
           uri: vscode.Uri.file(path.join(element.uri.fsPath, name)),
           type,
@@ -290,6 +324,12 @@ export class NjwapProvider {
       let children = await this.readDirectory(workspaceFolder.uri);
 
       children = children.filter(item => item[1] === vscode.FileType.Directory);
+
+      let includes = this.getIncludes();
+
+      if (includes !== false) {
+        children = children.filter(item => includes.first.indexOf(item[0]) >= 0);
+      }
 
       children.sort((a, b) => {
         if (a[1] === b[1]) {
