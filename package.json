@@ -2,7 +2,7 @@
   "name": "njwap-projects-tree-view",
   "displayName": "njwap-tree-view",
   "description": "为 njwap 项目定制的 Tree View 扩展",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "publisher": "hex-ci",
   "repository": "https://github.com/hex-ci/njwap-projects-tree-view-vscode",
   "license": "MIT",
@@ -53,17 +53,17 @@
         "command": "njwap-projects-tree-view.remove",
         "title": "删除"
       },
-			{
-				"command": "njwap-projects-tree-view.revealFile",
-				"title": "在 njwap 项目中显示"
-			}
+      {
+        "command": "njwap-projects-tree-view.revealFile",
+        "title": "在 njwap 项目中显示"
+      }
     ],
     "menus": {
-			"editor/title/context": [
-				{
-					"command": "njwap-projects-tree-view.revealFile"
-				}
-			],
+      "editor/title/context": [
+        {
+          "command": "njwap-projects-tree-view.revealFile"
+        }
+      ],
       "view/title": [
         {
           "command": "njwap-projects-tree-view.refresh",
