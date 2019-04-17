@@ -42,6 +42,10 @@
         "title": "新建文件夹"
       },
       {
+        "command": "njwap-projects-tree-view.importFile",
+        "title": "导入文件"
+      },
+      {
         "command": "njwap-projects-tree-view.createFile",
         "title": "新建文件"
       },
@@ -83,6 +87,11 @@
           "group": "njwap@2"
         },
         {
+          "command": "njwap-projects-tree-view.importFile",
+          "when": "viewItem == labelFolder",
+          "group": "njwap@3"
+        },
+        {
           "command": "njwap-projects-tree-view.createFolder",
           "when": "viewItem == folder",
           "group": "njwap@1"
@@ -93,24 +102,29 @@
           "group": "njwap@2"
         },
         {
-          "command": "njwap-projects-tree-view.rename",
-          "when": "viewItem == file",
-          "group": "njwap@3"
-        },
-        {
-          "command": "njwap-projects-tree-view.remove",
-          "when": "viewItem == file",
-          "group": "njwap@4"
-        },
-        {
-          "command": "njwap-projects-tree-view.rename",
+          "command": "njwap-projects-tree-view.importFile",
           "when": "viewItem == folder",
           "group": "njwap@3"
         },
         {
+          "command": "njwap-projects-tree-view.rename",
+          "when": "viewItem == file",
+          "group": "njwap@4"
+        },
+        {
           "command": "njwap-projects-tree-view.remove",
+          "when": "viewItem == file",
+          "group": "njwap@5"
+        },
+        {
+          "command": "njwap-projects-tree-view.rename",
           "when": "viewItem == folder",
           "group": "njwap@4"
+        },
+        {
+          "command": "njwap-projects-tree-view.remove",
+          "when": "viewItem == folder",
+          "group": "njwap@5"
         }
       ]
     },
