@@ -78,52 +78,52 @@
       "view/item/context": [
         {
           "command": "njwap-projects-tree-view.createFolder",
-          "when": "viewItem == labelFolder",
+          "when": "view == njwapProjects && viewItem == labelFolder",
           "group": "njwap@1"
         },
         {
           "command": "njwap-projects-tree-view.createFile",
-          "when": "viewItem == labelFolder",
+          "when": "view == njwapProjects && viewItem == labelFolder",
           "group": "njwap@2"
         },
         {
           "command": "njwap-projects-tree-view.importFile",
-          "when": "viewItem == labelFolder",
+          "when": "view == njwapProjects && viewItem == labelFolder",
           "group": "njwap@3"
         },
         {
           "command": "njwap-projects-tree-view.createFolder",
-          "when": "viewItem == folder",
+          "when": "view == njwapProjects && viewItem == folder",
           "group": "njwap@1"
         },
         {
           "command": "njwap-projects-tree-view.createFile",
-          "when": "viewItem == folder",
+          "when": "view == njwapProjects && viewItem == folder",
           "group": "njwap@2"
         },
         {
           "command": "njwap-projects-tree-view.importFile",
-          "when": "viewItem == folder",
+          "when": "view == njwapProjects && viewItem == folder",
           "group": "njwap@3"
         },
         {
           "command": "njwap-projects-tree-view.rename",
-          "when": "viewItem == file",
+          "when": "view == njwapProjects && viewItem == file",
           "group": "njwap@4"
         },
         {
           "command": "njwap-projects-tree-view.remove",
-          "when": "viewItem == file",
+          "when": "view == njwapProjects && viewItem == file",
           "group": "njwap@5"
         },
         {
           "command": "njwap-projects-tree-view.rename",
-          "when": "viewItem == folder",
+          "when": "view == njwapProjects && viewItem == folder",
           "group": "njwap@4"
         },
         {
           "command": "njwap-projects-tree-view.remove",
-          "when": "viewItem == folder",
+          "when": "view == njwapProjects && viewItem == folder",
           "group": "njwap@5"
         }
       ]
