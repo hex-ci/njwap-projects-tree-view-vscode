@@ -4,10 +4,10 @@ out/test/**
 out/**/*.map
 test/**
 src/**
+temp/**
 .gitignore
 .gitattributes
 .babelrc
 jsconfig.json
 .eslintrc.json
-px2rem.code-workspace
 images
