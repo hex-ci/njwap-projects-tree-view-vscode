@@ -488,6 +488,10 @@ export class NjwapExplorer {
       valueSelection: [0, path.basename(element.uri.path).lastIndexOf('.')]
     });
 
+    if (!result) {
+      return;
+    }
+
     await _.rename(element.uri.path, path.join(path.dirname(element.uri.path), result));
 
     this.treeDataProvider._onDidChangeTreeData.fire();
