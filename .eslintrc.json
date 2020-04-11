@@ -16,6 +16,8 @@
     "eslint:recommended"
   ],
   "rules": {
-    "no-console": "off"
+    "no-console": "off",
+    "prefer-const": "error",
+    "comma-spacing": "error"
   }
 }

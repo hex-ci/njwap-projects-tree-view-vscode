@@ -194,8 +194,8 @@ export class NjwapProvider {
       return false;
     }
 
-    let first = [];
-    let second = [];
+    const first = [];
+    const second = [];
 
     this.options.includes.forEach(item => {
       const value = item.split('/');
@@ -221,63 +221,66 @@ export class NjwapProvider {
   async getChildren(element) {
     this.options = vscode.workspace.getConfiguration('njwap-projects-tree-view');
 
-    if (!this.options.wwwPath || !this.options.wwwProjectPath) {
+    if (!this.options.projectPath) {
       return [];
     }
 
+    const njwapPath = path.join(this.options.projectPath, 'src', 'njwap');
+    const wwwPath = path.join(this.options.projectPath, 'src', 'www');
+
     if (element) {
       if (element.depth === 1) {
-        const currentPath = path.relative(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html'), element.uri.path);
+        const currentPath = path.relative(path.join(njwapPath, 'html'), element.uri.path);
 
         return [
           {
-            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html', currentPath)),
+            uri: vscode.Uri.file(path.join(njwapPath, 'html', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
             label: 'html',
-            pathType: 'wwwProject'
+            pathType: 'njwap'
           },
           {
-            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_js', currentPath)),
+            uri: vscode.Uri.file(path.join(njwapPath, 'cdn_js', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
             label: 'cdn_js',
-            pathType: 'wwwProject'
+            pathType: 'njwap'
           },
           {
-            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_css', currentPath)),
+            uri: vscode.Uri.file(path.join(njwapPath, 'cdn_css', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
             label: 'cdn_css',
-            pathType: 'wwwProject'
+            pathType: 'njwap'
           },
           {
-            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'cdn_img', currentPath)),
+            uri: vscode.Uri.file(path.join(njwapPath, 'cdn_img', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
             label: 'cdn_img',
-            pathType: 'wwwProject'
+            pathType: 'njwap'
           },
           {
-            uri: vscode.Uri.file(path.join(this.options.wwwPath, 'njwap_server', 'controller', currentPath)),
+            uri: vscode.Uri.file(path.join(wwwPath, 'njwap_server', 'controller', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
             label: 'controller',
             pathType: 'www'
           },
           {
-            uri: vscode.Uri.file(path.join(this.options.wwwPath, 'njwap_server', 'model', currentPath)),
+            uri: vscode.Uri.file(path.join(wwwPath, 'njwap_server', 'model', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
             label: 'model',
             pathType: 'www'
           },
           {
-            uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'less', currentPath)),
+            uri: vscode.Uri.file(path.join(njwapPath, 'less', currentPath)),
             type: vscode.FileType.Directory,
             depth: element.depth + 1,
             label: 'less',
-            pathType: 'wwwProject'
+            pathType: 'njwap'
           },
         ]
       }
@@ -302,7 +305,7 @@ export class NjwapProvider {
 
         children = children.filter(item => item[1] === vscode.FileType.Directory);
 
-        let includes = this.getIncludes();
+        const includes = this.getIncludes();
 
         if (includes !== false) {
           children = children.filter(item => includes.second.indexOf(item[0]) >= 0);
@@ -318,14 +321,14 @@ export class NjwapProvider {
     else {
       // 根级
       const workspaceFolder = {
-        uri: vscode.Uri.file(path.join(this.options.wwwProjectPath, 'njwap', 'src', 'html'))
+        uri: vscode.Uri.file(path.join(njwapPath, 'html'))
       };
 
       let children = await this.readDirectory(workspaceFolder.uri);
 
       children = children.filter(item => item[1] === vscode.FileType.Directory);
 
-      let includes = this.getIncludes();
+      const includes = this.getIncludes();
 
       if (includes !== false) {
         children = children.filter(item => includes.first.indexOf(item[0]) >= 0);
@@ -404,22 +407,25 @@ export class NjwapExplorer {
   async createFolder(element) {
     let currentPath;
 
+    const njwapPath = path.join(this.treeDataProvider.options.projectPath, 'src', 'njwap');
+    const wwwPath = path.join(this.treeDataProvider.options.projectPath, 'src', 'www');
+
     if (element.label) {
-      if (element.pathType === 'wwwProject') {
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwProjectPath, 'njwap', 'src', element.label), element.uri.path);
+      if (element.pathType === 'njwap') {
+        currentPath = path.relative(path.join(njwapPath, element.label), element.uri.path);
       }
       else {
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwPath, 'njwap_server', element.label), element.uri.path);
+        currentPath = path.relative(path.join(wwwPath, 'njwap_server', element.label), element.uri.path);
       }
     }
     else {
-      if (element.uri.path.indexOf(path.join(this.treeDataProvider.options.wwwProjectPath, 'njwap', 'src')) === 0) {
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwProjectPath, 'njwap', 'src'), element.uri.path);
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwProjectPath, 'njwap', 'src', currentPath.split(path.sep)[0]), element.uri.path);
+      if (element.uri.path.indexOf(njwapPath) === 0) {
+        currentPath = path.relative(njwapPath, element.uri.path);
+        currentPath = path.relative(path.join(njwapPath, currentPath.split(path.sep)[0]), element.uri.path);
         currentPath = currentPath.split(path.sep).slice(0, 2).join(path.sep);
       }
       else {
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwPath, 'njwap_server'), element.uri.path);
+        currentPath = path.relative(path.join(wwwPath, 'njwap_server'), element.uri.path);
       }
     }
 
@@ -440,22 +446,25 @@ export class NjwapExplorer {
   async createFile(element) {
     let currentPath;
 
+    const njwapPath = path.join(this.treeDataProvider.options.projectPath, 'src', 'njwap');
+    const wwwPath = path.join(this.treeDataProvider.options.projectPath, 'src', 'www');
+
     if (element.label) {
-      if (element.pathType === 'wwwProject') {
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwProjectPath, 'njwap', 'src', element.label), element.uri.path);
+      if (element.pathType === 'njwap') {
+        currentPath = path.relative(path.join(njwapPath, element.label), element.uri.path);
       }
       else {
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwPath, 'njwap_server', element.label), element.uri.path);
+        currentPath = path.relative(path.join(wwwPath, 'njwap_server', element.label), element.uri.path);
       }
     }
     else {
-      if (element.uri.path.indexOf(path.join(this.treeDataProvider.options.wwwProjectPath, 'njwap', 'src')) === 0) {
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwProjectPath, 'njwap', 'src'), element.uri.path);
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwProjectPath, 'njwap', 'src', currentPath.split(path.sep)[0]), element.uri.path);
+      if (element.uri.path.indexOf(njwapPath) === 0) {
+        currentPath = path.relative(njwapPath, element.uri.path);
+        currentPath = path.relative(path.join(njwapPath, currentPath.split(path.sep)[0]), element.uri.path);
         currentPath = currentPath.split(path.sep).slice(0, 2).join(path.sep);
       }
       else {
-        currentPath = path.relative(path.join(this.treeDataProvider.options.wwwPath, 'njwap_server'), element.uri.path);
+        currentPath = path.relative(path.join(wwwPath, 'njwap_server'), element.uri.path);
       }
     }
 

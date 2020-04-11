@@ -133,15 +133,10 @@
       "type": "object",
       "title": "njwap 配置",
       "properties": {
-        "njwap-projects-tree-view.wwwPath": {
+        "njwap-projects-tree-view.projectPath": {
           "type": "string",
           "default": "",
-          "description": "www 项目绝对路径"
-        },
-        "njwap-projects-tree-view.wwwProjectPath": {
-          "type": "string",
-          "default": "",
-          "description": "wwwProject 项目绝对路径"
+          "description": "changba 项目绝对路径"
         },
         "njwap-projects-tree-view.includes": {
           "type": "array",
@@ -168,8 +163,8 @@
     "@babel/preset-env": "^7.1.0",
     "@types/mocha": "^2.2.42",
     "@types/node": "^8.10.25",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^4.11.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.8.0",
     "typescript": "^2.6.1",
     "vscode": "^1.1.21"
   },
